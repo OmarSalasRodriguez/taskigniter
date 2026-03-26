@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Models\ProjectModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
 class ProjectController extends BaseController
@@ -12,7 +13,10 @@ class ProjectController extends BaseController
      */
     public function index()
     {
-        return view('projects/projects-list');
+        $model = model(ProjectModel::class);
+        $data['projects'] = $model->findAll();
+
+        return view('projects/projects-list', $data);
     }
 
     /**
@@ -27,7 +31,7 @@ class ProjectController extends BaseController
     /**
      * Muestra el formulario para crear un nuevo proyecto
      */
-    public function create()
+    public function new()
     {
         return view('projects/project-create');
     }
@@ -35,9 +39,23 @@ class ProjectController extends BaseController
     /**
      * Guarda un nuevo proyecto en la base de datos
      */
-    public function store()
+    public function create()
     {
-        // TODO: Agregar lógica para guardar en BD
+        $rules = [
+            'name' => 'required|min_length[3]|max_length[255]',
+            'description' => 'required',
+        ];
+        if ($this->validate($rules)) {
+            return redirect()->back()->with('errors', $this->validator->getErrors());
+        }
+
+        $model = model(ProjectModel::class);
+        $model->insert([
+            'name' => $this->request->getPost('name'),
+            'description' => $this->request->getPost('description'),
+        ]);
+
+        return redirect()->to('/projects')->with('success', 'Proyecto creado exitosamente');
     }
 
     /**
