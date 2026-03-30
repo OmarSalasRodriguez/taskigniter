@@ -13,6 +13,7 @@ class ProjectController extends BaseController
      */
     public function index()
     {
+        log_message('info', 'Lista de proyectos cargada');
         $model = model(ProjectModel::class);
         $data['projects'] = $model->findAll();
 
@@ -21,11 +22,14 @@ class ProjectController extends BaseController
 
     /**
      * Muestra los detalles de un proyecto específico
-     * @param int $id ID del proyecto
+     * @param string $id ID del proyecto
      */
-    public function show($id)
+    public function show(string $id)
     {
-        return view('projects/project-details');
+        $id = (int) $id;
+        $model = model(ProjectModel::class);
+        $data['project'] = $model->find($id);
+        return view('projects/project-details', $data);
     }
 
     /**
@@ -45,8 +49,8 @@ class ProjectController extends BaseController
             'name' => 'required|min_length[3]|max_length[255]',
             'description' => 'required',
         ];
-        if ($this->validate($rules)) {
-            return redirect()->back()->with('errors', $this->validator->getErrors());
+        if (!$this->validate($rules)) {
+            return redirect()->back()->with('errors', $this->validator->getErrors())->withInput();
         }
 
         $model = model(ProjectModel::class);
@@ -64,24 +68,45 @@ class ProjectController extends BaseController
      */
     public function edit($id)
     {
-        return view('projects/project-edit');
+        $model = model(ProjectModel::class);
+        $data['project'] = $model->find($id);
+
+        return view('projects/project-edit', $data);
     }
 
     /**
      * Actualiza un proyecto existente en la base de datos
      * @param int $id ID del proyecto a actualizar
      */
-    public function update($id)
+    public function update(string $id)
     {
-        // TODO: Agregar lógica para actualizar en BD
+        $id = (int) $id;
+        $rules = [
+            'name' => 'required|min_length[3]|max_length[255]',
+            'description' => 'required',
+        ];
+        if (!$this->validate($rules)) {
+            return redirect()->back()->with('errors', $this->validator->getErrors())->withInput();
+        }
+
+        $model = model(ProjectModel::class);
+        $model->update($id, [
+            'name' => $this->request->getPost('name'),
+            'description' => $this->request->getPost('description'),
+        ]);
+
+        return redirect()->to('/projects')->with('success', 'Proyecto actualizado exitosamente');
     }
 
     /**
      * Elimina un proyecto de la base de datos
      * @param int $id ID del proyecto a eliminar
      */
-    public function delete($id)
+    public function delete(string $id)
     {
-        // TODO: Agregar lógica para eliminar de BD
+        $id = (int) $id;
+        $model = model(ProjectModel::class);
+        $model->delete($id);
+        return redirect()->to('/projects')->with('success', 'Proyecto eliminado exitosamente');
     }
 }

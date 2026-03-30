@@ -9,6 +9,13 @@
     </a>
 </div>
 
+<?php if (session()->getFlashdata('success')): ?>
+<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+    <?= session()->getFlashdata('success') ?>
+</div>
+<?php endif; ?>
+
+
 <?php if (empty($projects)): ?>
     <p class="text-gray-500 text-center py-8">No hay proyectos aún.</p>
 <?php else: ?>

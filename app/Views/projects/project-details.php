@@ -28,9 +28,12 @@
         <a href="/projects/<?= $project['id'] ?>/edit" class="bg-gray-800 text-white px-4 py-2 rounded text-sm hover:bg-gray-700 transition">
             Editar
         </a>
-        <a href="/projects/<?= $project['id'] ?>/delete" class="px-4 py-2 text-red-600 hover:text-red-800 text-sm">
-            Eliminar
-        </a>
+        <form action="/projects/<?= $project['id'] ?>" method="post" onsubmit="return confirm('¿Estás seguro de eliminar este proyecto?');">
+            <input type="hidden" name="_method" value="DELETE">
+            <button type="submit" class="px-4 py-2 text-red-600 hover:text-red-800 text-sm">
+                Eliminar
+            </button>
+        </form>
     </div>
 </div>
 
